@@ -5,8 +5,11 @@ class TestGrammars < Minitest::Test
 
   # List of projects that are allowed without licenses
   PROJECT_WHITELIST = [
-    # Dual MIT and GPL license
+    "vendor/grammars/factor",
+    "vendor/grammars/go-tmbundle",
+    "vendor/grammars/jflex.tmbundle",
     "vendor/grammars/language-csharp",
+    "vendor/grammars/language-viml",
     "vendor/grammars/sublimeassembly"
   ].freeze
 
@@ -123,7 +126,7 @@ class TestGrammars < Minitest::Test
   private
 
   def submodule_paths
-    @submodule_paths ||= `git config --list --file "#{File.join(ROOT, ".gitmodules")}"`.lines.grep(/\.path=/).map { |line| line.chomp.split("=", 2).last }
+    @submodule_paths ||= `git config --list --file "#{File.join(ROOT, ".gitmodules")}"`.lines.grep(/\.path=/).map { |line| line.chomp.split("=", 2).last }.reject { |path| path =~ /CodeMirror/ }
   end
 
   # Returns a hash of submodules in the form of submodule_path => license
@@ -151,7 +154,7 @@ class TestGrammars < Minitest::Test
 
     # Neither Licensee nor our own regex was able to detect the license, let's check the readme
     files = Dir[File.join(ROOT, submodule, "*")]
-    if readme = files.find { |path| File.basename(path) =~ /\Areadme\b/i }
+    if readme = files.find { |file| File.basename(file) =~ /\Areadme\b/i }
       classify_license(readme)
     end
   end
